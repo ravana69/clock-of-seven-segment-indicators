@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>CodePen - Clock of seven-segment indicators</title>
+  <link rel="stylesheet" href="./style.css">
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/99/three.min.js"></script>
+<!--script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script-->
+<script>
+  var lineVertShader = `
+  #define dig0 !(digit != -1.0 && digit != 1.0 && digit != 4.0)
+  #define dig1 !(digit != -1.0 && digit != 1.0 && digit != 2.0 && digit != 3.0 && digit != 7.0)
+  #define dig2 !(digit != -1.0 && digit != 5.0 && digit != 6.0)
+  #define dig3 !(digit != -1.0 && digit != 0.0 && digit != 1.0 && digit != 7.0)
+  #define dig4 !(digit != -1.0 && digit != 1.0 && digit != 3.0 && digit != 4.0 && digit != 5.0 && digit != 7.0 && digit != 9.0)
+  #define dig5 !(digit != -1.0 && digit != 2.0)
+  #define dig6 !(digit != -1.0 && digit != 1.0 && digit != 4.0 && digit != 7.0)
+  #define cond(a) if(int(idx + 0.1) == (a) && 
+  #define retVal ){return 1.0;}
+  
+  uniform float digit;
+  attribute float idx;
+  varying float vOff;
+  varying vec2 vUv;
+  
+  float isOff(){
+    cond(0) dig0 retVal
+    else cond(1) dig1 retVal
+    else cond(2) dig2 retVal
+    else cond(3) dig3 retVal
+    else cond(4) dig4 retVal
+    else cond(5) dig5 retVal
+    else cond(6) dig6 retVal
+    
+    //return 1.0;
+  }
+
+  void main() {
+    vOff = isOff();
+    vUv = uv;
+    vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+    gl_Position = projectionMatrix * mvPosition;
+  }
+  `;
+
+  var lineFragShader = `
+  uniform vec3 diffuse1;
+  uniform vec3 diffuse2;
+  varying float vOff;
+  varying vec2 vUv;
+  
+  void main() {
+    
+    if (vOff > 0.5) discard;
+    
+    gl_FragColor = vec4( mix(diffuse1, diffuse2, vUv.y), 1.0 );
+  }
+  `;
+
+</script>
+
+<!--https://developers.google.com/youtube/iframe_api_reference?hl=ru#Loading_a_Video_Player-->
+<div id="player"></div>
+
+<script src="https://www.youtube.com/iframe_api"></script>
+<script>
+  var player;
+
+  function onYouTubePlayerAPIReady() {
+    console.log("!");
+    player = new YT.Player('player', {
+      height: Math.floor(window.innerHeight / 4),
+      width: Math.floor(window.innerWidth / 3),
+      videoId: 'hdfXA4-6p8g',
+      events: {
+        'onReady': onPlayerReady
+      }
+
+    });
+
+    function onPlayerReady(event) {
+      event.target.playVideo();
+    }
+
+  }
+
+</script>
+<!-- partial -->
+  <script  src="./script.js"></script>
+
+</body>
+</html>
